@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="popup.js"></script>
+<style type="text/css">
+#backgroundPopup{   
+    display:none;   
+    position:fixed;   
+    position:absolute;   
+    height:100%;   
+    width:100%;   
+    top:0;   
+    left:0;   
+    background:#000000;   
+    border:1px solid #cecece;   
+    z-index:1;   
+}   
+
+#popupContact{   
+    display:none;   
+    position:fixed;   
+    position:absolute;   
+    height:384px;   
+    width:408px;   
+    background:#FFFFFF;   
+    border:2px solid #cecece;   
+    z-index:2;   
+    padding:12px;   
+    font-size:13px;   
+}   
+
+#popupContact h1{   
+    text-align:left;   
+    color:#6FA5FD;   
+    font-size:22px;   
+    font-weight:700;   
+    border-bottom:1px dotted #D3D3D3;   
+    padding-bottom:2px;   
+    margin-bottom:20px;   
+}   
+#popupContactClose{   
+    font-size:14px;   
+    line-height:14px;   
+    right:6px;   
+    top:4px;   
+    position:absolute;   
+    color:#6fa5fd;   
+    font-weight:700;   
+    display:block;   
+}
+</style>
+</head>
+ 
+ <body>  
+    <center> 
+        <div id="button"><input type="submit" value="点击这里查看效果" /></div>  
+    </center>  
+    <div id="popupContact">  
+        <a id="popupContactClose">X</a>  
+        <h1>弹出窗口的标题</h1>  
+        <p id="contactArea">  
+            这就是我们创建的漂亮DIV弹窗效果。可以看到jQuery实在是非常强大，我们仅需少量的CSS和JavaScript代码即可完成这一效果。<br/><br/>  
+            我们可以在这个弹窗之中放置一个登录框、注册表单、重要事件提醒等等。   
+            <br/><br/>  
+            要关闭这个窗口，请点击右上方的X按钮或点击弹窗外的背景或按下键盘上的ESC键。   
+            <br/><br/>
+        </p>  
+    </div>  
+    <div id="backgroundPopup"></div>  
+<script>
+var popupStatus = 0;
+
+//使用Jquery加载弹窗 
+function loadPopup(){   
+    //仅在开启标志popupStatus为0的情况下加载  
+    if(popupStatus==0){   
+        $("#backgroundPopup").css({   
+            "opacity": "0.6"  
+        });   
+        //fadeIn() 方法使用淡入效果来显示被选元素，假如该元素是隐藏的。
+        //$("#backgroundPopup").fadeIn("slow");   
+        //$("#popupContact").fadeIn("slow");   
+        $("#backgroundPopup").show();   
+        $("#popupContact").show(); 
+        popupStatus = 1;   
+    }   
+} 
+
+   
+//将弹出窗口定位在屏幕的中央
+function centerPopup(){   
+    //获取系统变量
+    var windowWidth = document.documentElement.clientWidth;   
+    var windowHeight = document.documentElement.clientHeight;   
+    
+    //alert("屏宽：" + windowWidth + "，" + "屏高：" + windowHeight);
+    var popupHeight = $("#popupContact").height();   
+    var popupWidth = $("#popupContact").width();   
+    //居中设置   
+    $("#popupContact").css({   
+        "position": "absolute",   
+        "top": windowHeight/2-popupHeight/2,   
+        "left": windowWidth/2-popupWidth/2,   
+    });   
+}
+</script>
+</body>    
+</html>

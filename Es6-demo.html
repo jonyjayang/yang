@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<h1>ES6demo1</h1>
+
+<body>
+  <script>
+    function sum(x, y, z) {
+      let total = 0;
+      if (x) {
+        total += x;
+      }
+      if (y) {
+        total += y;
+      }
+      if (z) {
+        total += z;
+      }
+      console.log(total);
+
+    }
+    sum(5, '', 9);
+// rest方法运用
+    function sum2(...m) {
+      let total = 0;
+      for (i of m) {
+        total += i;
+
+      }
+      console.log(total);
+
+    }
+    sum2(4, 8, 9, 10);
+// es6语法使用
+let sum3=(...m)=>{
+ 
+    let jay = 0;
+      for (i of m) {
+        jay += i;
+
+      }
+      console.log(jay);
+
+} 
+sum3(5,8,9,10);
+var [x,y]=[4,8];
+ 
+// ...和数组一起表示数组的扩展进行许算
+let arr1=[1,3];
+let arr2=[4,8];
+console.log("concat:"+arr1.concat(arr2));
+[...arr1,...arr2]
+var [x,...y]=[4,8,15,35];
+  </script>
+
+</body>
+
+</html>

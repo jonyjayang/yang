@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\server",
+    "\\server\\bin",
+    "\\server\\routes",
+    "\\src",
+    "\\src\\components",
+    "\\src\\views"
+  ],
+  "SelectedNode": "\\src\\views\\GoodsList.vue",
+  "PreviewInSolutionExplorer": false
+}
