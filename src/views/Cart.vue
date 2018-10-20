@@ -60,42 +60,42 @@
               </ul>
             </div>
             <ul class="cart-item-list">
-              <li>
+              <li v-for="(item,index) in cartList" :key="index">
                 <div class="cart-tab-1">
                   <div class="cart-item-check">
-                    <a href="javascipt:;" class="checkbox-btn item-check-btn">
+                    <a  class="checkbox-btn item-check-btn " v-bind:class="{'check':item.checked=='1'}" @click="editCart('checked',item)">
                       <svg class="icon icon-ok">
                         <use xlink:href="#icon-ok"></use>
                       </svg>
                     </a>
                   </div>
                   <div class="cart-item-pic">
-                    <img src="/static/1.jpg">
+                    <img :src="'/static/'+item.productImage">
                   </div>
                   <div class="cart-item-title">
-                    <div class="item-name">XX</div>
+                    <div class="item-name">{{item.productName}}</div>
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">1000</div>
+                  <div class="item-price">{{item.salePrice}}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub">-</a>
-                        <span class="select-ipt">10</span>
-                        <a class="input-add">+</a>
+                        <a class="input-sub" @click="editCart('decrease',item)" >-</a>
+                        <span class="select-ipt">{{item.productNum}}</span>
+                        <a class="input-add"  @click="editCart('add',item)">+</a>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">100</div>
+                  <div class="item-price-total">{{item.productNum*item.salePrice}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
-                    <a href="javascript:;" class="item-edit-btn">
+                    <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -110,8 +110,8 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
-                  <span class="checkbox-btn item-check-btn">
+                <a @click="ToggleCheckAll" >
+                  <span class="checkbox-btn item-check-btn"  v-bind:class="{'check':checkAllFlag}"> 
                       <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
                   </span>
                   <span>Select all</span>
@@ -131,31 +131,39 @@
       </div>
     </div>
   <nav-footer></nav-footer>
+   <Modal :mdShow="modalConfirm" @close="closeModal">
+      <p slot="message">你确认要删除此条数据吗?</p>
+      <div slot="btnGroup">
+        <a class="btn btn--m" href="javascript:;" @click="delCart">确认</a>
+        <a class="btn btn--m btn--red" href="javascript:;" @click="modalConfirm = false">关闭</a>
+      </div>
+    </Modal>
   </div>
 </template>
 <style>
-  .input-sub,.input-add{
-    min-width: 40px;
-    height: 100%;
-    border: 0;
-    color: #605F5F;
-    text-align: center;
-    font-size: 16px;
-    overflow: hidden;
-    display: inline-block;
-    background: #f0f0f0;
-  }
-  .item-quantity .select-self-area{
-    background:none;
-    border: 1px solid #f0f0f0;
-  }
-  .item-quantity .select-self-area .select-ipt{
-    display: inline-block;
-    padding:0 3px;
-    width: 30px;
-    min-width: 30px;
-    text-align: center;
-  }
+.input-sub,
+.input-add {
+  min-width: 40px;
+  height: 100%;
+  border: 0;
+  color: #605f5f;
+  text-align: center;
+  font-size: 16px;
+  overflow: hidden;
+  display: inline-block;
+  background: #f0f0f0;
+}
+.item-quantity .select-self-area {
+  background: none;
+  border: 1px solid #f0f0f0;
+}
+.item-quantity .select-self-area .select-ipt {
+  display: inline-block;
+  padding: 0 3px;
+  width: 30px;
+  min-width: 30px;
+  text-align: center;
+}
 </style>
 <script>
 import NavHeader from "@/components/NavHeader.vue";
@@ -163,18 +171,84 @@ import NavFooter from "@/components/NavFooter.vue";
 import NavBread from "@/components/NavBread.vue";
 import Modal from "@/components/Modal.vue";
 import axios from "axios";
-import './../assets/css/checkout.css'
-    export default{
-        data(){
-            return{
-
-            }
-        },
-       components: {
+import "./../assets/css/checkout.css";
+export default {
+  data() {
+    return {
+      cartList: [],
+      modalConfirm: false,
+      delItem: {}
+    };
+  },
+  components: {
     NavHeader,
     NavFooter,
     NavBread,
     Modal
   },
+  mounted() {
+    this.init();
+  },
+  methods: {
+    init() {
+      axios.get("/users/cartList").then(response => {
+        let res = response.data;
+        this.cartList = res.result;
+      });
+    },
+    closeModal() {
+      this.modalConfirm = false;
+    },
+    delCartConfirm(item) {
+      this.delItem = item;
+      this.modalConfirm = true;
+    },
+    delCart() {
+      axios
+        .post("/users/cartDel", {
+          productId: this.delItem.productId
+        })
+        .then(response => {
+          let res = response.data;
+          console.log(res);
+          if (res.status == 0) {
+            this.modalConfirm = false;
+            this.init();
+          }
+        });
+    },
+    editCart(flag, item) {
+      if (flag == "add") {
+        item.productNum++;
+      } else if (flag == "decrease") {
+        if (item.productNum <= 1) {
+          return;
+        }
+        item.productNum--;
+      } else {
+        if (flag == "checked") {
+          item.checked = item.checked == "1" ? "0" : "1";
+        }
+      }
+      axios
+        .post("/users/editCart", {
+          productId: item.productId,
+          productNum: item.productNum,
+          checked: item.checked
+        })
+        .then(response => {
+          let res = response.data;
+        });
+    },
+    ToggleCheckAll(){
+        var flag=!this.checkAllFlag;
+         this.cartList.forEach((item)=>{
+                  item.checked = flag?'1':'0';
+        })
+        axios.post("/users/editCheckAll",{ checkAll:flag}).then((response)=>{
+          
+        })
     }
+  }
+};
 </script>

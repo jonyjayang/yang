@@ -54,4 +54,80 @@ router.get("/checkLogin", function (req,res,next) {
     });
   }
 });
+
+//显示用户购物车
+router.get("/cartList",function(req,res,next){
+let userId=req.cookies.userId;
+User.findOne({userId:userId},function(err,doc){
+  if(err){
+    res.json({
+      status:"1",
+      err:err.message,
+      result:""
+
+    })
+
+  }else{
+    if(doc){
+      res.json({
+        status:"0",
+        err:"",
+        result:doc.cartList
+      })
+    }
+
+  }
+})
+});
+//删除购物车商品
+router.post("/cartDel",function(req,res,next){
+  var userId=req.cookies.userId, productId=req.body.productId;//获取id
+  User.update({userId:userId},{$pull:{
+    //pull删除该用户的购物车内的商品
+    'cartList':{
+      "productId":productId
+    }
+  }},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        err:err.message,
+        result:""
+      });  
+    }
+    else{
+      res.json({
+        status:'0',
+        msg:'',
+        result:'suc'
+      });
+    }
+  }
+)
+});
+//添加商品数量
+router.post("/editCart",function(req,res,next){
+  var userId=req.cookies.userId, productId=req.body.productId ,productNum=req.body.productNum,checked=req.body.checked;
+  User.update({"userId":userId,"cartList.productId":productId},{
+    "cartList.$.productNum":productNum,
+    "cartList.$.checked":checked
+  },function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        err:err.message,
+        result:""
+      });  
+    }
+    else{
+      res.json({
+        status:'0',
+        msg:'',
+        result:'suc'
+      });
+    }
+  })
+
+})
+
 module.exports = router;
