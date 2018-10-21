@@ -77,7 +77,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">{{item.salePrice}}</div>
+                  <div class="item-price">{{item.salePrice|currency("$")}}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
@@ -91,7 +91,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum*item.salePrice}}</div>
+                  <div class="item-price-total">{{(item.productNum*item.salePrice)|currency("$")}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -111,7 +111,7 @@
             <div class="cart-foot-l">
               <div class="item-all-check">
                 <a @click="ToggleCheckAll" >
-                  <span class="checkbox-btn item-check-btn"  v-bind:class="{'check':checkAllFlag}"> 
+                  <span class="checkbox-btn item-check-btn" v-bind:class="{'check':checkAllFlag}"> 
                       <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
                   </span>
                   <span>Select all</span>
@@ -120,7 +120,7 @@
             </div>
             <div class="cart-foot-r">
               <div class="item-total">
-                Item total: <span class="total-price">500</span>
+                Item total: <span class="total-price">{{totalPrice|currency('$')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red">Checkout</a>
@@ -171,14 +171,40 @@ import NavFooter from "@/components/NavFooter.vue";
 import NavBread from "@/components/NavBread.vue";
 import Modal from "@/components/Modal.vue";
 import axios from "axios";
+import {currency} from './../util/currency'
 import "./../assets/css/checkout.css";
 export default {
   data() {
     return {
       cartList: [],
       modalConfirm: false,
-      delItem: {}
+      delItem: {},
+    
     };
+  },
+  // filters:{
+  //  currency:currency
+  // },
+  computed:{
+  checkAllFlag(){
+            return this.checkedCount == this.cartList.length;
+          },
+          checkedCount(){
+            var i = 0;
+            this.cartList.forEach((item)=>{
+              if(item.checked=='1')i++;
+            })
+            return i;
+          },
+          totalPrice(){
+            var money = 0;
+            this.cartList.forEach((item)=>{
+              if(item.checked=='1'){
+                money += parseFloat(item.salePrice)*parseInt(item.productNum);
+              }
+            })
+            return money;
+          }
   },
   components: {
     NavHeader,
@@ -242,10 +268,15 @@ export default {
     },
     ToggleCheckAll(){
         var flag=!this.checkAllFlag;
+        console.log(flag);
          this.cartList.forEach((item)=>{
                   item.checked = flag?'1':'0';
         })
         axios.post("/users/editCheckAll",{ checkAll:flag}).then((response)=>{
+            let res=response.data;
+             if(res.status=='0'){
+                        console.log("update suc");
+                    }
           
         })
     }
