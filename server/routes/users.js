@@ -166,6 +166,29 @@ router.post("/editCheckAll",function(req,res,next){
     }
 
   })  
-})
+});
+//用户地址管理
+router.get("/addressList",function (req,res,next) {
+    var userId = req.cookies.userId;
+    User.findOne({userId:userId},function (err,doc) {
+      if (err) {
+        res.json({
+          status: "1",
+          err: err.message,
+          result: ""
+
+        })
+      } else {
+        res.json({
+          status: '0',
+          msg: '',
+          result: doc.addressList
+        });
+      }
+
+
+      })
+
+  })
 
 module.exports = router;
