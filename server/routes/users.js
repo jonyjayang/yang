@@ -189,6 +189,85 @@ router.get("/addressList",function (req,res,next) {
 
       })
 
-  })
+  });
+  //删除地址管理
+  router.post("/delAddress",function(req,res,next){
+    var userId=req.cookies.userId, addressId=req.body.addressId;
+    User.update({userId:userId},{
+      $pull:{
+      'addressList':{
+        'addressId':addressId
+      }
+    }},function(err,doc){
+      if (err) {
+        res.json({
+          status: "1",
+          err: err.message,
+          result: ""
 
+        })
+      } else {
+        res.json({
+          status: '0',
+          msg: '',
+          result: "suc"
+        });
+      }
+    })
+  });
+  //设置默认地址
+router.post("/setDefault",function(req,res,next){
+  var userId=req.cookies.userId, addressId=req.body.addressId;
+  if(!addressId){
+    res.json({
+      status:'1003',
+      msg:'addressId is null',
+      result:''
+    }); 
+  }else{
+    User.findOne({userId:userId},function(err,doc){
+      if(err){
+        res.json({
+          status:"1",
+          err:err.message,
+          result:""
+
+        })
+      }else{
+        var addressList=doc.addressList;
+        addressList.forEach((item)=>{
+            if(item.addressId==addressId){
+              item.isDefault = true;
+              // console.log(item.isDefault);
+            }else{
+              item.isDefault = false;
+            }
+        });
+        // console.log(addressList);
+        // console.log(doc);
+        doc.save(function(err1,doc1){
+          if(err1){
+            res.json({
+              status:"1",
+              err:err.message,
+              result:''
+            })
+          }else{
+            res.json({
+              status:"0",
+              err:"",
+              result:"suc"
+            });
+          }
+        })
+      }
+  })
+  }
+});
+//用户支付页面
+router.post("/payMent",function(req,res,next){
+  var userId=req.cookies.userId, addressId=req.body.addressId  orderTotal = req.body.orderTotal;;
+
+
+})
 module.exports = router;
