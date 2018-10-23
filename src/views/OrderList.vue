@@ -138,58 +138,64 @@ import NavHeader from "@/components/NavHeader.vue";
 import NavFooter from "@/components/NavFooter.vue";
 import NavBread from "@/components/NavBread.vue";
 import Modal from "@/components/Modal.vue";
-import {currency} from './../util/currency.js'
+import { currency } from "./../util/currency.js";
 import axios from "axios";
-    export default {
-        components:{
-            NavHeader,
-            NavFooter,
-            NavBread,
-            Modal
-        },
-        data(){
-            return{
-                cartList:[],
-                shipping:100,
-                discount:200,
-                tax:400,
-                orderTotal:0,
-                subTotal:0,
-            }
-        },
-        mounted(){
-            this.init();
-        },
-          filters:{
-        currency:currency
-      },
-        methods:{
-            init(){
-                axios.get("/users/cartList").then((response)=>{
-                    let res=response.data;
-                    this.cartList = res.result;
-                    this.cartList.forEach((item)=>{
-                        if(item.checked=="1"){
-                            this.subTotal+=item.salePrice*item.productNum;
-                        }
-                    });
-                   this.orderTotal = this.subTotal+this.shipping-this.discount+this.tax;
-                })
-            },
-            payMent(){
-                     var addressId = this.$route.query.addressId;//获取本页面的addressId
-                axios.post("/users/payMent",{addressId:addressId, orderTotal:this.orderTotal}).then((response)=>{
-                    let res=response.data;
-                    
-
-                })
-
-            }
-        }
-        
+export default {
+  components: {
+    NavHeader,
+    NavFooter,
+    NavBread,
+    Modal
+  },
+  data() {
+    return {
+      cartList: [],
+      shipping: 100,
+      discount: 200,
+      tax: 400,
+      orderTotal: 0,
+      subTotal: 0
+    };
+  },
+  mounted() {
+    this.init();
+  },
+  filters: {
+    currency: currency
+  },
+  methods: {
+    init() {
+      axios.get("/users/cartList").then(response => {
+        let res = response.data;
+        this.cartList = res.result;
+        this.cartList.forEach(item => {
+          if (item.checked == "1") {
+            this.subTotal += item.salePrice * item.productNum;
+          }
+        });
+        this.orderTotal =
+          this.subTotal + this.shipping - this.discount + this.tax;
+      });
+    },
+    payMent() {
+      var addressId = this.$route.query.addressId; //获取本页面的addressId
+      axios
+        .post("/users/payMent", {
+          addressId: addressId,
+          orderTotal: this.orderTotal
+        })
+        .then(response => {
+          let res = response.data;
+          if (res.status == "0") {
+            this.$router.push({
+              path: "/orderSuccess?orderId=" + res.result.orderId
+            });
+          }
+        });
     }
+  }
+};
 </script>
 
 <style scoped>
-
 </style>

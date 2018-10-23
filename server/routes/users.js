@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var User=require("./../models/user");
+require('./../util/util')
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -266,7 +268,69 @@ router.post("/setDefault",function(req,res,next){
 });
 //用户支付页面
 router.post("/payMent",function(req,res,next){
-  var userId=req.cookies.userId, addressId=req.body.addressId  orderTotal = req.body.orderTotal;;
+  var userId=req.cookies.userId, addressId=req.body.addressId,orderTotal = req.body.orderTotal;
+  User.findOne({userId:userId},function (err,doc) {
+    if(err){
+      res.json({
+        status:"1",
+        err:err.message,
+        result:""
+      })
+    }else{
+      var address="",goodsList=[];
+      doc.addressList.forEach((item)=>{
+        if(item.addressId==addressId){
+          address=item;
+        }
+      });
+      doc.cartList.forEach((item)=>{
+        if(item.checked=="1"){
+          goodsList.push(item);
+        }
+      });
+    //生成订单号
+    var platform=622;//设置特殊数字标识符
+    var r1 = Math.floor(Math.random() * 10);//生成随机数1
+    var r2 = Math.floor(Math.random() * 10); //生成随机数2
+    var sysDate=new Date().Format('yyyyMMddhhmmss');//系统时间
+    var createDate = new Date().Format('yyyy-MM-dd hh:mm:ss')//创建订单时间
+    var orderId=platform+r1+sysDate+r2;//生成订单
+
+    //将所有订单信息存储与数组中
+    var order={
+      orderId:orderId,
+      orderTotal:orderTotal,
+      addressinfo:address,
+      goodsList:goodsList,
+      orderStatus: '1',
+      createDate: createDate
+    };
+     doc.orderList.push(order);
+
+    doc.save(function (err1,doc1) {
+        if(err1){
+          res.json({
+            status:"1",
+            err:err.message,
+            result:""
+          });
+        }else{
+           res.json({
+             status: "0",
+             msg: '',
+             result: {
+               orderId: order.orderId,
+               orderTotal: order.orderTotal
+             }
+           });
+
+        }
+      })
+
+
+
+    }
+    })
 
 
 })
