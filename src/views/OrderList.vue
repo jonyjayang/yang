@@ -188,7 +188,7 @@ export default {
           let res = response.data;
           if (res.status == "0") {
             this.$router.push({
-              path: "/orderSuccess?orderId=" + res.result.orderId
+              path: "/suc?orderId=" + res.result.orderId
             });
           }
         });
