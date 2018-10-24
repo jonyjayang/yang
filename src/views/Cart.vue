@@ -239,6 +239,8 @@ export default {
           console.log(res);
           if (res.status == 0) {
             this.modalConfirm = false;
+                  var delCount = this.delItem.productNum;
+               this.$store.commit("updateCartCount",-delCount);
             this.init();
           }
         });
@@ -264,6 +266,7 @@ export default {
         })
         .then(response => {
           let res = response.data;
+            this.$store.commit("updateCartCount",flag=="add"?1:-1);
         });
     },
     ToggleCheckAll(){

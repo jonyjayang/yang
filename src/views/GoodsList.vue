@@ -157,6 +157,7 @@ export default {
           console.log(res.status);
           if (res.status == 0) {
             alert("家去成功");
+              this.$store.commit("updateCartCount",1);
           } else {
             this.mdShow = true;
           }

@@ -25,6 +25,11 @@ User.findOne(param,function(err,doc){
         path:'/',
         maxAge:1000*60*60
       });
+      res.cookie("userName", doc.userName, {
+        path: '/',
+        maxAge: 1000 * 60 * 60
+      });
+
       // req.session.user=doc;
       res.json({
         status:'0',
@@ -39,6 +44,51 @@ User.findOne(param,function(err,doc){
 
 })
 });
+//获取用户购物车数量
+router.get("/getCartCount", function (req, res, next) {
+  if (req.cookies && req.cookies.userId) {
+    console.log("userId:" + req.cookies.userId);
+    var userId = req.cookies.userId;
+    User.findOne({ "userId": userId }, function (err, doc) {
+      if (err) {
+        res.json({
+          status: "0",
+          msg: err.message,
+          result: ''
+        });
+      } else {
+        let cartList = doc.cartList;
+        let cartCount = 0;
+        cartList.map(function (item) {
+          cartCount += parseFloat(item.productNum);
+        });
+        res.json({
+          status: "0",
+          msg: "",
+          result: cartCount
+        });
+      }
+    });
+  } else {
+    res.json({
+      status: "0",
+      msg: "当前用户不存在"
+    });
+  }
+});
+//登出
+router.post("/logout", function (req, res, next) {
+  res.cookie("userId", "", {
+    path: "/",
+    maxAge: -1
+  })
+  res.json({
+    status: "0",
+    msg: '',
+    result: ''
+  })
+});
+
 //登陆校验
 router.get("/checkLogin", function (req,res,next) {
   if(req.cookies.userId){
